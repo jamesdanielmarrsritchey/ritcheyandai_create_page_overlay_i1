@@ -1,0 +1,143 @@
+jamesdanielmarrsritchey: Write a Javascript function which run, will create a div that covers the whole webpage, and run a specified function. However, if the div is already covering the webpage, instead it should delete the div, and not run the specified function.
+
+GitHub Copilot: ```javascript
+// JavaScript function to toggle a full-page div and run a specified function
+
+function toggleCoverAndRunFunction(specificFunction) {
+  // Check if the cover div already exists
+  const existingCover = document.getElementById('fullPageCover');
+
+  if (existingCover) {
+    // If the div exists, remove it from the document
+    document.body.removeChild(existingCover);
+  } else {
+    // If the div does not exist, create it and append it to the body
+    const coverDiv = document.createElement('div');
+    coverDiv.id = 'fullPageCover';
+    coverDiv.style.position = 'fixed';
+    coverDiv.style.top = '0';
+    coverDiv.style.left = '0';
+    coverDiv.style.width = '100%';
+    coverDiv.style.height = '100%';
+    coverDiv.style.backgroundColor = 'rgba(0,0,0,0.5)'; // Example styling, can be customized
+    coverDiv.style.zIndex = '1000'; // Ensure it covers other content
+    document.body.appendChild(coverDiv);
+
+    // Run the specified function only after creating the div
+    specificFunction();
+  }
+}
+
+// Example usage
+toggleCoverAndRunFunction(() => {
+  console.log('Cover div created and specific function executed.');
+});
+```
+
+jamesdanielmarrsritchey: The user needs to be able to say which function to run. The function isn't included in this function.
+
+GitHub Copilot: ```javascript
+function toggleCoverAndExecuteFunction(funcToRun) {
+  // Check if the cover div already exists
+  const existingCover = document.getElementById('fullPageCover');
+
+  if (existingCover) {
+    // If the div exists, remove it from the document
+    document.body.removeChild(existingCover);
+  } else {
+    // If the div does not exist, create it and append it to the body
+    const coverDiv = document.createElement('div');
+    coverDiv.id = 'fullPageCover';
+    coverDiv.style.position = 'fixed';
+    coverDiv.style.top = '0';
+    coverDiv.style.left = '0';
+    coverDiv.style.width = '100%';
+    coverDiv.style.height = '100%';
+    coverDiv.style.backgroundColor = 'rgba(0,0,0,0.5)'; // Example styling, can be customized
+    coverDiv.style.zIndex = '1000'; // Ensure it covers other content
+    document.body.appendChild(coverDiv);
+
+    // Run the specified function only after creating the div
+    funcToRun();
+  }
+}
+
+// To use the function, define any function you want to run
+function myCustomFunction() {
+  console.log('This is my custom function being executed.');
+}
+
+// And then pass it as an argument to the toggleCoverAndExecuteFunction
+toggleCoverAndExecuteFunction(myCustomFunction);
+```
+
+jamesdanielmarrsritchey: Explain this code.
+
+GitHub Copilot: This JavaScript function, `toggleCoverAndExecuteFunction`, dynamically manages a full-page overlay (`div`) on a webpage and executes a specified function when the overlay is created. Here's a step-by-step explanation:
+
+1. **Function Definition**: The function `toggleCoverAndExecuteFunction` is defined with one parameter, `funcToRun`, which is expected to be a function that will be executed under certain conditions.
+
+2. **Check for Existing Cover**: It first checks if an element with the ID `fullPageCover` already exists in the document. This is done using `document.getElementById('fullPageCover')`. The result is stored in `existingCover`.
+
+3. **Existing Cover Logic**:
+   - If `existingCover` is truthy (meaning the element exists), the script removes this element from the document body using `document.body.removeChild(existingCover)`. This effectively removes the overlay from the webpage. In this case, the specified function `funcToRun` is not executed.
+   
+4. **Creating a New Cover**:
+   - If `existingCover` is falsy (meaning no such element exists), the script proceeds to create a new `div` element. This `div` is configured to cover the entire viewport:
+     - **Positioning and Size**: It is given a fixed position (`position: 'fixed'`) and is stretched to cover the entire viewport by setting its `top`, `left`, `width`, and `height` properties to `0`, `0`, `100%`, and `100%`, respectively.
+     - **Styling**: The `backgroundColor` is set to a semi-transparent black (`rgba(0,0,0,0.5)`) as an example, but this can be customized. The `zIndex` is set to `1000` to ensure it appears above most other content.
+     - **Identification**: It is assigned an ID of `fullPageCover` so it can be identified and managed in subsequent calls to the function.
+   - After creating and configuring the `div`, it is appended to the document body using `document.body.appendChild(coverDiv)`, making it visible on the page.
+
+5. **Executing the Specified Function**: Only after creating and displaying the new cover `div`, the function `funcToRun` passed as an argument to `toggleCoverAndExecuteFunction` is executed. This allows for any custom logic to be run immediately after the overlay is shown.
+
+6. **Usage Example**: The last part of the code demonstrates how to use `toggleCoverAndExecuteFunction`. A custom function `myCustomFunction` is defined, which simply logs a message to the console. This function is then passed as an argument to `toggleCoverAndExecuteFunction`, which will either add the overlay and execute `myCustomFunction` (if the overlay doesn't already exist) or remove the overlay (if it does exist) without executing the function.
+
+This function is useful for scenarios where you want to conditionally display an overlay on the webpage and perform some action when the overlay is shown, but not when it's hidden.
+
+jamesdanielmarrsritchey: The overlay function needs to include an X button at the top right of the div, which onclick will execute the overlay function. This way it can be used to toggle off the div.
+
+GitHub Copilot: ```javascript
+function toggleCoverAndExecuteFunction(funcToRun) {
+  const existingCover = document.getElementById('fullPageCover');
+
+  if (existingCover) {
+    document.body.removeChild(existingCover);
+  } else {
+    const coverDiv = document.createElement('div');
+    coverDiv.id = 'fullPageCover';
+    coverDiv.style.position = 'fixed';
+    coverDiv.style.top = '0';
+    coverDiv.style.left = '0';
+    coverDiv.style.width = '100%';
+    coverDiv.style.height = '100%';
+    coverDiv.style.backgroundColor = 'rgba(0,0,0,0.5)';
+    coverDiv.style.zIndex = '1000';
+
+    // Create an X button to close the overlay
+    const closeButton = document.createElement('button');
+    closeButton.innerText = 'X';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '20px';
+    closeButton.style.right = '20px';
+    closeButton.style.zIndex = '1001'; // Ensure it's above the overlay
+
+    // Add click event listener to the button to toggle the overlay off
+    closeButton.addEventListener('click', function() {
+      toggleCoverAndExecuteFunction(funcToRun); // Recursively calls the main function
+    });
+
+    coverDiv.appendChild(closeButton);
+    document.body.appendChild(coverDiv);
+
+    funcToRun();
+  }
+}
+
+// Example usage
+function myCustomFunction() {
+  console.log('Overlay toggled and custom function executed.');
+}
+
+toggleCoverAndExecuteFunction(myCustomFunction);
+```
